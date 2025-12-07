@@ -1,0 +1,41 @@
+# 智能问答应用配置文件
+spring:
+  application:
+    name: ai-agent
+  # 默认 dev 环境
+  profiles:
+    active: dev
+# application.yml
+  ai:
+    dashscope:
+      api-key: sk-f5814bb7cf5f4f43baef97c3c85fee01
+      chat:
+        options:
+          model: qwen-plus
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# springdoc-openapi项目配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.huzi.aiagent.controller
+
+# knife4j的增强配置，不需要增强可以不配
+knife4j:
+  enable: true
+  setting:
+    language: zh-CN
+
+
+
