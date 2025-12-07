@@ -1,5 +1,6 @@
 package com.huzi.chpai.agent;
 
+import com.huzi.chpai.advisor.ContentSafetyAdvisor;
 import com.huzi.chpai.advisor.MyLoggerAdvisor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -33,7 +34,8 @@ public class CampusMultiAgent {
                 .defaultSystem(SYSTEM_PROMPT)
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(chatMemory),
-                        new MyLoggerAdvisor()
+                        new MyLoggerAdvisor(),
+                        new ContentSafetyAdvisor()
                 )
                 .build();
     }
@@ -47,7 +49,6 @@ public class CampusMultiAgent {
                 .call()
                 .chatResponse();
         String content = response.getResult().getOutput().getText();
-        //log.info("content: {}", content);
         return content;
     }
 
