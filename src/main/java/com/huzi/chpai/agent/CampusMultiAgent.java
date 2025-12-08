@@ -2,6 +2,7 @@ package com.huzi.chpai.agent;
 
 import com.huzi.chpai.advisor.ContentSafetyAdvisor;
 import com.huzi.chpai.advisor.MyLoggerAdvisor;
+import com.huzi.chpai.chatmemory.FileBasedChatMemory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -29,13 +30,16 @@ public class CampusMultiAgent {
 
     public CampusMultiAgent(ChatModel dashscopeChatModel) {
 
-        ChatMemory chatMemory = new InMemoryChatMemory();
+        // 初始化基于文件的对话记忆
+        String fileDir = System.getProperty("user.dir") + "/tmp/chat-memory";
+        ChatMemory chatMemory = new FileBasedChatMemory(fileDir);
+        //ChatMemory chatMemory = new InMemoryChatMemory();
         chatClient = ChatClient.builder(dashscopeChatModel)
                 .defaultSystem(SYSTEM_PROMPT)
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(chatMemory),
-                        new MyLoggerAdvisor(),
-                        new ContentSafetyAdvisor()
+                        new MyLoggerAdvisor()
+                        //new ContentSafetyAdvisor()
                 )
                 .build();
     }
