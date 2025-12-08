@@ -12,6 +12,10 @@ spring:
       chat:
         options:
           model: qwen-plus
+  # 引入独立的违禁词配置文件
+  config:
+    import:
+      - classpath:sensitive-words.yml
 
 server:
   port: 8080
