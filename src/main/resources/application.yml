@@ -5,6 +5,12 @@ spring:
   # 默认 dev 环境
   profiles:
     active: dev
+  # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/CHP-AI2.0
+    username: root
+    password: huanghu0831
 # application.yml
   ai:
     dashscope:
@@ -40,6 +46,20 @@ knife4j:
   enable: true
   setting:
     language: zh-CN
+
+# MyBatis Flex 配置（可选，大部分默认即可）
+mybatis-flex:
+  mapper-packages: com.huzi.chpai.mapper
+  # 是否开启驼峰命名转换（默认 true）
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # 逻辑删除配置（可选，后续示例会用到）
+  global-config:
+    logic-delete:
+      column: is_deleted # 逻辑删除字段名
+      value: 1 # 已删除的值
+      null-value: 0 # 未删除的值
 
 
 

@@ -1,13 +1,10 @@
 package com.huzi.chpai.agent;
 
-import com.huzi.chpai.advisor.ContentSafetyAdvisor;
 import com.huzi.chpai.advisor.MyLoggerAdvisor;
-import com.huzi.chpai.chatmemory.FileBasedChatMemory;
+import com.huzi.chpai.chatmemory.MySQLChatMemory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Component;
@@ -23,21 +20,29 @@ public class CampusMultiAgent {
 
     private final ChatClient chatClient;
 
-    private static final String SYSTEM_PROMPT = "扮演深耕恋爱心理领域的专家。开场向用户表明身份，告知用户可倾诉恋爱难题。" +
-            "围绕单身、恋爱、已婚三种状态提问：单身状态询问社交圈拓展及追求心仪对象的困扰；" +
-            "恋爱状态询问沟通、习惯差异引发的矛盾；已婚状态询问家庭责任与亲属关系处理的问题。" +
-            "引导用户详述事情经过、对方反应及自身想法，以便给出专属解决方案。用一句话回答问题。";
 
-    public CampusMultiAgent(ChatModel dashscopeChatModel) {
+    private static final String SYSTEM_PROMPT = "你是一个校园多智能体系统，包含以下角色能力：\n\n" +
+        "🎓 学术顾问：提供选课建议、学习计划、学术资源推荐\n" +
+        "🏠 生活助手：解答宿舍、食堂、校园设施相关问题\n" +
+        "📋 行政助理：协助成绩查询、证书办理、流程咨询\n" +
+        "💼 职业规划师：提供实习、就业、考研指导\n" +
+        "🤝 心理辅导员：倾听学业压力、人际关系困扰\n\n" +
+        "请根据用户问题自动切换合适的角色，提供精准、专业的服务。\n" +
+        "回答要简洁明了，重要信息请分点说明。";
+
+    public CampusMultiAgent(ChatModel dashscopeChatModel,MySQLChatMemory mySQLChatMemory) {
 
         // 初始化基于文件的对话记忆
-        String fileDir = System.getProperty("user.dir") + "/tmp/chat-memory";
-        ChatMemory chatMemory = new FileBasedChatMemory(fileDir);
+        //String fileDir = System.getProperty("user.dir") + "/tmp/chat-memory";
+        //ChatMemory fileBasedChatMemory = new FileBasedChatMemory(fileDir);
+        // 初始化基于内存的对话记忆
         //ChatMemory chatMemory = new InMemoryChatMemory();
+        // 初始化基于MySQL的对话记忆
+        //ChatMemory mySQLChatMemory = new MySQLChatMemory();
         chatClient = ChatClient.builder(dashscopeChatModel)
                 .defaultSystem(SYSTEM_PROMPT)
                 .defaultAdvisors(
-                        new MessageChatMemoryAdvisor(chatMemory),
+                        new MessageChatMemoryAdvisor(mySQLChatMemory),
                         new MyLoggerAdvisor()
                         //new ContentSafetyAdvisor()
                 )
@@ -62,7 +67,7 @@ public class CampusMultiAgent {
     public LoveReport doChatWithReport(String message, String chatId) {
         LoveReport loveReport = chatClient
                 .prompt()
-                .system(SYSTEM_PROMPT + "每次对话后都要生成恋爱结果，标题为{用户名}的恋爱报告，内容为建议列表")
+                .system(SYSTEM_PROMPT + "每次对话后都要生成对话结果，标题为{用户名}的对话报告，内容为建议列表")
                 .user(message)
                 .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
