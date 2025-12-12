@@ -14,7 +14,7 @@ spring:
 # application.yml
   ai:
     dashscope:
-      api-key: sk-f5814bb7cf5f4f43baef97c3c85fee01
+      api-key: 123456
       chat:
         options:
           model: qwen-plus
